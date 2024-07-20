@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dating goals</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #container {
+            width: 50%;
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #itemList {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .itemBox {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            cursor: move;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .itemBox.dragging {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <ul id="itemList"></ul>
+    </div>
+
+    <script>
+        // List of items
+        const items = ['欢乐', '陪伴', '体贴', '稳定', '浪漫','繁衍后代','志趣相投','帮助', '性','物质'];
+
+        // Reference to the item list element
+        const itemList = document.getElementById('itemList');
+
+        // Function to create and append item boxes
+        function createItemBox(item, index) {
+            const li = document.createElement('li');
+            li.className = 'itemBox';
+            li.draggable = true;
+            li.innerHTML = `<strong>${index + 1}.</strong> ${item}`;
+            itemList.appendChild(li);
+
+            li.addEventListener('dragstart', () => {
+                li.classList.add('dragging');
+            });
+
+            li.addEventListener('dragend', () => {
+                li.classList.remove('dragging');
+                updateIndices();
+            });
+        }
+
+        // Append items to the list
+        items.forEach((item, index) => {
+            createItemBox(item, index);
+        });
+
+        // Function to update the indices of the items
+        function updateIndices() {
+            const itemBoxes = document.querySelectorAll('.itemBox');
+            itemBoxes.forEach((box, index) => {
+                box.innerHTML = `<strong>${index + 1}.</strong> ${box.textContent.trim().split('. ')[1]}`;
+            });
+        }
+
+        // Function to get the item after the current dragging position
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.itemBox:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        itemList.addEventListener('dragover', e => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(itemList, e.clientY);
+            const draggingElement = document.querySelector('.dragging');
+            if (afterElement == null) {
+                itemList.appendChild(draggingElement);
+            } else {
+                itemList.insertBefore(draggingElement, afterElement);
+            }
+        });
+    </script>
+</body>
+</html>
