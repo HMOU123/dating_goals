@@ -34,15 +34,61 @@
             cursor: move;
             border-radius: 4px;
             text-align: center;
+            touch-action: none; /* Prevent touch actions */
         }
         .itemBox.dragging {
             opacity: 0.5;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div id="container">
         <ul id="itemList"></ul>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>拖拽以改变顺序</p>
+            <img src="image.jpg" alt="Instruction Image" style="width: 100%; height: auto;">
+        </div>
     </div>
 
     <script>
@@ -71,14 +117,12 @@
 
             // Touch event listeners for mobile and tablet
             li.addEventListener('touchstart', (e) => {
-                e.preventDefault();
                 const touch = e.touches[0];
                 li.classList.add('dragging');
-                li.touchY = touch.clientY;
+                li.touchStartY = touch.clientY;
             });
 
             li.addEventListener('touchmove', (e) => {
-                e.preventDefault();
                 const touch = e.touches[0];
                 const draggingElement = document.querySelector('.dragging');
                 const afterElement = getDragAfterElement(itemList, touch.clientY);
@@ -87,12 +131,13 @@
                 } else {
                     itemList.insertBefore(draggingElement, afterElement);
                 }
+                e.preventDefault();
             });
 
             li.addEventListener('touchend', (e) => {
-                e.preventDefault();
                 li.classList.remove('dragging');
                 updateIndices();
+                e.preventDefault();
             });
         }
 
@@ -134,6 +179,24 @@
                 itemList.insertBefore(draggingElement, afterElement);
             }
         });
+
+        // Modal handling
+        const modal = document.getElementById('myModal');
+        const span = document.getElementsByClassName('close')[0];
+
+        window.onload = function() {
+            modal.style.display = 'flex';
+        };
+
+        span.onclick = function() {
+            modal.style.display = 'none';
+        };
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
     </script>
 </body>
 </html>
