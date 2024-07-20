@@ -47,7 +47,7 @@
 
     <script>
         // List of items
-        const items = ['欢乐', '陪伴', '体贴', '稳定', '浪漫','繁衍后代','志趣相投','帮助', '性','物质'];
+        const items = ['欢乐', '陪伴', '体贴', '稳定', '浪漫','繁衍后代','志趣相投','帮助', '性','物质','目标相同'];
 
         // Reference to the item list element
         const itemList = document.getElementById('itemList');
@@ -65,6 +65,32 @@
             });
 
             li.addEventListener('dragend', () => {
+                li.classList.remove('dragging');
+                updateIndices();
+            });
+
+            // Touch event listeners for mobile and tablet
+            li.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                li.classList.add('dragging');
+                li.touchY = touch.clientY;
+            });
+
+            li.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const draggingElement = document.querySelector('.dragging');
+                const afterElement = getDragAfterElement(itemList, touch.clientY);
+                if (afterElement == null) {
+                    itemList.appendChild(draggingElement);
+                } else {
+                    itemList.insertBefore(draggingElement, afterElement);
+                }
+            });
+
+            li.addEventListener('touchend', (e) => {
+                e.preventDefault();
                 li.classList.remove('dragging');
                 updateIndices();
             });
